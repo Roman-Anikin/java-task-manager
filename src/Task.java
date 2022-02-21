@@ -3,7 +3,7 @@ public class Task {
     private String name;
     private String description;
     private String status;
-    private int id;
+    private Long id;
 
     public Task(String name, String description, String status) {
         this.name = name;
@@ -11,11 +11,11 @@ public class Task {
         this.status = status;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
