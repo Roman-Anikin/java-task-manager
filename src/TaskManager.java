@@ -72,23 +72,16 @@ public class TaskManager {
     }
 
     //Метод для создания новой подзадачи (также происходит добавление подзадачи в список эпика и обновление статуса)
-    public void createNewSubtask(Subtask subtask, EpicTask epicTask) {
+    public void createNewSubtask(Subtask subtask) {
         subtask.setId(generateId());
-        subtask.setEpicId(epicTask.getId());
-        epicTask.getEpicSubtasks().add(subtask);
+        epicList.get(subtask.getEpicId()).getEpicSubtasks().add(subtask);
         subtaskList.put(subtask.getId(), subtask);
-        changeEpicStatus(epicTask);
+        changeEpicStatus(epicList.get(subtask.getEpicId()));
     }
 
     //Метод для обновления задачи
     public void updateTask(Task task) {
-        for (Task t : taskList.values()) {
-            if (t.getName().equals(task.getName())) {
-                task.setId(t.getId());
-                taskList.put(t.getId(), task);
-                break;
-            }
-        }
+        taskList.put(task.getId(), task);
     }
 
     //Метод для обновления эпика
@@ -98,17 +91,10 @@ public class TaskManager {
 
     //Метод для обновления подзадачи (также происходит обновление статуса эпика)
     public void updateSubtask(Subtask subtask) {
-        for (Subtask s : subtaskList.values()) {
-            if (s.getName().equals(subtask.getName())) {
-                subtask.setId(s.getId());
-                subtask.setEpicId(s.getEpicId());
-                subtaskList.put(s.getId(), subtask);
-                break;
-            }
-        }
+        subtaskList.put(subtask.getId(), subtask);
         EpicTask epicTask = epicList.get(subtask.getEpicId());
         for (int i = 0; i < epicTask.getEpicSubtasks().size(); i++) {
-            if (epicTask.getEpicSubtasks().get(i).getName().equals(subtask.getName())) {
+            if (epicTask.getEpicSubtasks().get(i).getId().equals(subtask.getId())) {
                 epicTask.getEpicSubtasks().set(i, subtask);
                 break;
             }
