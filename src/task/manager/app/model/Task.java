@@ -1,11 +1,13 @@
+package task.manager.app.model;
+
 public class Task {
 
     private String name;
     private String description;
-    private String status;
+    private TaskStatus status;
     private Long id;
 
-    public Task(String name, String description, String status) {
+    public Task(String name, String description, TaskStatus status) {
         this.name = name;
         this.description = description;
         this.status = status;
@@ -27,11 +29,21 @@ public class Task {
         return description;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
 
-    public String getStatus() {
+    public TaskStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", id=" + id +
+                '}';
     }
 }
