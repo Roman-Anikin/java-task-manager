@@ -5,11 +5,7 @@ import task.manager.app.model.*;
 import task.manager.app.utility.Managers;
 
 import java.util.List;
-/*
-Привет, Наталья!
-Разобраться в последней части задания "Сделайте историю задач интерфейсом" до конца не удалось.
-Надеюсь ошибок не очень много.
-*/
+
 public class Main {
     public static void main(String[] args) {
 
