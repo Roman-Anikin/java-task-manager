@@ -36,13 +36,21 @@ public class InMemoryTaskManager implements TaskManager {
     //Метод для удаления всех задач
     @Override
     public void deleteAllTasks() {
+        for (Long l : taskList.keySet()) {
+            Managers.getDefaultHistory().remove(l);
+        }
         taskList.clear();
-
     }
 
     //Метод для удаления всех эпиков
     @Override
     public void deleteAllEpics() {
+        for (Long l : subtaskList.keySet()) {
+            Managers.getDefaultHistory().remove(l);
+        }
+        for (Long l : epicList.keySet()) {
+            Managers.getDefaultHistory().remove(l);
+        }
         epicList.clear();
         subtaskList.clear();
     }
@@ -51,6 +59,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubtasks() {
         for (EpicTask epicTask : epicList.values()) {
+            for (Subtask s : epicTask.getEpicSubtasks()) {
+                Managers.getDefaultHistory().remove(s.getId());
+            }
             epicTask.getEpicSubtasks().clear();
             changeEpicStatus(epicTask);
         }
@@ -131,6 +142,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(Long id) {
         taskList.remove(id);
+        Managers.getDefaultHistory().remove(id);
     }
 
     //Метод для удаления эпика по ИД (также происходит удаление подзадач эпика)
@@ -145,8 +157,10 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (Long l : keys) {
             subtaskList.remove(l);
+            Managers.getDefaultHistory().remove(l);
         }
         epicList.remove(id);
+        Managers.getDefaultHistory().remove(id);
     }
 
     //Метод для удаления подзадачи по ИД (также происходит удаление из списка эпика)
@@ -157,6 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
         epicTask.getEpicSubtasks().remove(subtask);
         subtaskList.remove(id);
         changeEpicStatus(epicTask);
+        Managers.getDefaultHistory().remove(id);
     }
 
     //Метод для получения списка подзадач по эпику
