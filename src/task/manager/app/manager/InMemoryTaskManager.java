@@ -12,6 +12,7 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Long, Task> taskList = new HashMap<>();
     private HashMap<Long, EpicTask> epicList = new HashMap<>();
     private HashMap<Long, Subtask> subtaskList = new HashMap<>();
+    private HistoryManager historyManager = Managers.getDefaultHistory();
     private static Long id = 0L;
 
 
@@ -37,7 +38,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTasks() {
         for (Long l : taskList.keySet()) {
-            Managers.getDefaultHistory().remove(l);
+            historyManager.remove(l);
         }
         taskList.clear();
     }
@@ -46,10 +47,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         for (Long l : subtaskList.keySet()) {
-            Managers.getDefaultHistory().remove(l);
+            historyManager.remove(l);
         }
         for (Long l : epicList.keySet()) {
-            Managers.getDefaultHistory().remove(l);
+            historyManager.remove(l);
         }
         epicList.clear();
         subtaskList.clear();
@@ -60,7 +61,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllSubtasks() {
         for (EpicTask epicTask : epicList.values()) {
             for (Subtask s : epicTask.getEpicSubtasks()) {
-                Managers.getDefaultHistory().remove(s.getId());
+                historyManager.remove(s.getId());
             }
             epicTask.getEpicSubtasks().clear();
             changeEpicStatus(epicTask);
@@ -71,21 +72,21 @@ public class InMemoryTaskManager implements TaskManager {
     //Метод для получения задачи по ИД
     @Override
     public Task getTaskById(Long id) {
-        Managers.getDefaultHistory().add(taskList.get(id));
+        historyManager.add(taskList.get(id));
         return taskList.get(id);
     }
 
     //Метод для получения эпика по ИД
     @Override
     public EpicTask getEpicById(Long id) {
-        Managers.getDefaultHistory().add(epicList.get(id));
+        historyManager.add(epicList.get(id));
         return epicList.get(id);
     }
 
     //Метод для получения подзадачи по ИД
     @Override
     public Subtask getSubtaskById(Long id) {
-        Managers.getDefaultHistory().add(subtaskList.get(id));
+        historyManager.add(subtaskList.get(id));
         return subtaskList.get(id);
     }
 
@@ -142,7 +143,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(Long id) {
         taskList.remove(id);
-        Managers.getDefaultHistory().remove(id);
+        historyManager.remove(id);
     }
 
     //Метод для удаления эпика по ИД (также происходит удаление подзадач эпика)
@@ -157,10 +158,10 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (Long l : keys) {
             subtaskList.remove(l);
-            Managers.getDefaultHistory().remove(l);
+            historyManager.remove(l);
         }
         epicList.remove(id);
-        Managers.getDefaultHistory().remove(id);
+        historyManager.remove(id);
     }
 
     //Метод для удаления подзадачи по ИД (также происходит удаление из списка эпика)
@@ -171,7 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
         epicTask.getEpicSubtasks().remove(subtask);
         subtaskList.remove(id);
         changeEpicStatus(epicTask);
-        Managers.getDefaultHistory().remove(id);
+        historyManager.remove(id);
     }
 
     //Метод для получения списка подзадач по эпику
@@ -207,6 +208,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> history() {
-        return Managers.getDefaultHistory().getHistory();
+        return historyManager.getHistory();
     }
 }

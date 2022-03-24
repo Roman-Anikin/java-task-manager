@@ -6,6 +6,11 @@ import task.manager.app.utility.Managers;
 
 import java.util.List;
 
+/* Здарвствуйте, Александр.
+Спасибо за подробные комментарии. Убрал статичность, протестировал. Добавил переменную HistoryManager
+в InMemoryTaskManager.
+*/
+
 public class Main {
     public static void main(String[] args) {
 
@@ -53,6 +58,22 @@ public class Main {
         for (Task task : taskList) {
             System.out.println(task);
         }
+        System.out.println();
+
+        TaskManager taskManager1 = Managers.getDefault();
+
+        Task task3 = new Task("task3", "task3", TaskStatus.NEW);
+        Task task4 = new Task("task4", "task4", TaskStatus.IN_PROGRESS);
+
+        taskManager1.createNewTask(task3);
+        taskManager1.createNewTask(task4);
+
+        taskManager1.getTaskById(task3.getId());
+        taskManager1.getTaskById(task4.getId());
+
+        List<Task> taskList1 = taskManager1.history();
+        for (Task task : taskList1) {
+            System.out.println(task);
+        }
     }
 }
-

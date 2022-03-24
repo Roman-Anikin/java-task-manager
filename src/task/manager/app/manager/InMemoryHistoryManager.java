@@ -6,11 +6,11 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private static Map<Long, TaskNode<Task>> taskNode = new HashMap<>();
-    private static TaskLinkedList taskLinkedList = new TaskLinkedList();
+    private Map<Long, TaskNode<Task>> taskNode = new HashMap<>();
+    private TaskLinkedList taskLinkedList = new TaskLinkedList();
 
     // Вложенный класс связный список
-    private static class TaskLinkedList {
+    private class TaskLinkedList {
         private TaskNode<Task> head;
         private TaskNode<Task> tail;
         private int size = 0;
@@ -63,7 +63,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     // Метод для удаления узла
-    private static void removeNode(TaskNode<Task> taskNode) {
+    private void removeNode(TaskNode<Task> taskNode) {
         taskNode.task = null;
         if (taskNode.prev != null) {
             taskNode.prev.next = taskNode.next;
