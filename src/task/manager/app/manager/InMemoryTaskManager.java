@@ -9,10 +9,10 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private HashMap<Long, Task> taskList = new HashMap<>();
-    private HashMap<Long, EpicTask> epicList = new HashMap<>();
-    private HashMap<Long, Subtask> subtaskList = new HashMap<>();
-    private HistoryManager historyManager = Managers.getDefaultHistory();
+    protected HashMap<Long, Task> taskList = new HashMap<>();
+    protected HashMap<Long, EpicTask> epicList = new HashMap<>();
+    protected HashMap<Long, Subtask> subtaskList = new HashMap<>();
+    protected HistoryManager historyManager = Managers.getDefaultHistory();
     private static Long id = 0L;
 
 
@@ -101,7 +101,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createNewEpic(EpicTask epic) {
         epic.setId(generateId());
-        updateEpic(epic);
+        changeEpicStatus(epic);
         epicList.put(epic.getId(), epic);
     }
 
@@ -204,6 +204,7 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             epicTask.setStatus(TaskStatus.IN_PROGRESS);
         }
+        updateEpic(epicTask);
     }
 
     @Override
