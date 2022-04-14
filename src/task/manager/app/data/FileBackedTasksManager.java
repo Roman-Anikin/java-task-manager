@@ -138,10 +138,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             for (Task t : tasks.values()) {
                 bf.write(toString(t) + "\n");
             }
-        } catch (IOException ioException) {
-            throw new ManagerSaveException();
-        }
-        try (BufferedWriter bf = new BufferedWriter(new FileWriter(String.valueOf(path), true))) {
             bf.write("\n" + toString(historyManager));
         } catch (IOException ioException) {
             throw new ManagerSaveException();
@@ -242,7 +238,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        FileBackedTasksManager fb = new FileBackedTasksManager(Path.of("src/task/manager/app/tasks.csv"));
+        FileBackedTasksManager fb = new FileBackedTasksManager(Path.of("src/task/manager/app/data/tasks.csv"));
 
         Task task = new Task("task", "task disc", TaskStatus.DONE);
         fb.createNewTask(task);
@@ -265,16 +261,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         fb.getSubtaskById(subtask.getId());
         fb.getEpicById(epicTask.getId());
 
-//        FileBackedTasksManager fb1 = loadFromFile(Path.of("src/task/manager/app/tasks.csv"));
-//
-//        for (Task t : tasks.values()) {
-//            System.out.println(t);
-//        }
-//        System.out.println();
-//
-//        List<Task> taskLst = fb1.historyManager.getHistory();
-//        for (Task t : taskLst) {
-//            System.out.println(t);
-//        }
+        FileBackedTasksManager fb1 = loadFromFile(Path.of("src/task/manager/app/tasks.csv"));
+
+        for (Task t : tasks.values()) {
+            System.out.println(t);
+        }
+        System.out.println();
+
+        List<Task> taskLst = fb1.historyManager.getHistory();
+        for (Task t : taskLst) {
+            System.out.println(t);
+        }
     }
 }
