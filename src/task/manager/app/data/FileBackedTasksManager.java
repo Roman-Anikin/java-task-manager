@@ -238,7 +238,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        FileBackedTasksManager fb = new FileBackedTasksManager(Path.of("src/task/manager/app/data/tasks.csv"));
+        FileBackedTasksManager fb = new FileBackedTasksManager(Path.of("src/task/manager/app/files/tasks.csv"));
 
         Task task = new Task("task", "task disc", TaskStatus.DONE);
         fb.createNewTask(task);
@@ -261,7 +261,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         fb.getSubtaskById(subtask.getId());
         fb.getEpicById(epicTask.getId());
 
-        FileBackedTasksManager fb1 = loadFromFile(Path.of("src/task/manager/app/tasks.csv"));
+        FileBackedTasksManager fb1 = loadFromFile(Path.of("src/task/manager/app/files/tasks.csv"));
 
         for (Task t : tasks.values()) {
             System.out.println(t);

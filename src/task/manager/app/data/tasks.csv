@@ -1,8 +1,0 @@
-id,type,name,status,description,epic
-0,TASK,task,DONE,task disc,
-1,EPIC,epic,IN_PROGRESS,epic disc,
-2,SUBTASK,sub,IN_PROGRESS,sub disc,1
-3,TASK,task2,IN_PROGRESS,disc2,
-4,SUBTASK,sub2,NEW,disc 2,1
-
-0,2,1
