@@ -3,9 +3,7 @@ package task.manager.app.manager;
 import task.manager.app.model.*;
 import task.manager.app.utility.Managers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -14,6 +12,23 @@ public class InMemoryTaskManager implements TaskManager {
     protected HashMap<Long, Subtask> subtaskList = new HashMap<>();
     protected HistoryManager historyManager = Managers.getDefaultHistory();
     private static Long id = 0L;
+    private Set<Task> prioritizedTasks = new TreeSet<>();
+
+
+    public List<Task> getPrioritizedTasks() {
+        return findIntersections(new ArrayList<>(prioritizedTasks));
+    }
+
+    private List<Task> findIntersections(List<Task> tasks) {
+        for (int i = 1; i < tasks.size(); i++) {
+            if (tasks.get(i).getStartTime() != null && tasks.get(i - 1).getEndTime()
+                    .isAfter(tasks.get(i).getStartTime())) {
+                prioritizedTasks.remove(tasks.get(i));
+                tasks.remove(tasks.get(i));
+            }
+        }
+        return tasks;
+    }
 
 
     //Метод для получения списка всех задач
@@ -50,6 +65,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(l);
         }
         for (Long l : epicList.keySet()) {
+            epicList.get(l).getEpicSubtasks().clear();
             historyManager.remove(l);
         }
         epicList.clear();
@@ -93,14 +109,19 @@ public class InMemoryTaskManager implements TaskManager {
     //Метод для создания нового задания
     @Override
     public void createNewTask(Task task) {
-        task.setId(generateId());
+        if (!taskList.containsKey(task.getId())) {
+            task.setId(generateId());
+        }
         taskList.put(task.getId(), task);
+        prioritizedTasks.add(task);
     }
 
     //Метод для создания нового эпика
     @Override
     public void createNewEpic(EpicTask epic) {
-        epic.setId(generateId());
+        if (!epicList.containsKey(epic.getId())) {
+            epic.setId(generateId());
+        }
         changeEpicStatus(epic);
         epicList.put(epic.getId(), epic);
     }
@@ -108,26 +129,33 @@ public class InMemoryTaskManager implements TaskManager {
     //Метод для создания новой подзадачи (также происходит добавление подзадачи в список эпика и обновление статуса)
     @Override
     public void createNewSubtask(Subtask subtask) {
-        subtask.setId(generateId());
+        if (!subtaskList.containsKey(subtask.getId())) {
+            subtask.setId(generateId());
+        }
         epicList.get(subtask.getEpicId()).getEpicSubtasks().add(subtask);
         subtaskList.put(subtask.getId(), subtask);
         changeEpicStatus(epicList.get(subtask.getEpicId()));
+        prioritizedTasks.add(subtask);
     }
 
     //Метод для обновления задачи
     @Override
     public void updateTask(Task task) {
+        prioritizedTasks.remove(taskList.get(task.getId()));
         taskList.put(task.getId(), task);
+        prioritizedTasks.add(task);
     }
 
     //Метод для обновления эпика
     private void updateEpic(EpicTask epic) {
         epicList.put(epic.getId(), epic);
+
     }
 
     //Метод для обновления подзадачи (также происходит обновление статуса эпика)
     @Override
     public void updateSubtask(Subtask subtask) {
+        prioritizedTasks.remove(subtaskList.get(subtask.getId()));
         subtaskList.put(subtask.getId(), subtask);
         EpicTask epicTask = epicList.get(subtask.getEpicId());
         for (int i = 0; i < epicTask.getEpicSubtasks().size(); i++) {
@@ -137,6 +165,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         changeEpicStatus(epicTask);
+        prioritizedTasks.add(subtask);
     }
 
     //Метод для удаления задачи по ИД
@@ -153,6 +182,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Long l : subtaskList.keySet()) {
             Subtask subtask = subtaskList.get(l);
             if (subtask.getEpicId().equals(id)) {
+                epicList.get(id).getEpicSubtasks().remove(subtask);
                 keys.add(l);
             }
         }

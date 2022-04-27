@@ -1,6 +1,6 @@
 package task.manager.app.model;
 
-public class Subtask extends Task {
+public class Subtask extends Task implements Comparable<Task> {
 
     private Long epicId;
 
@@ -24,5 +24,15 @@ public class Subtask extends Task {
                 ", status=" + getStatus() +
                 ", id=" + getId() + ", epicID=" + epicId +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Subtask task = (Subtask) o;
+        return getName().equals(task.getName()) && getDescription().equals(task.getDescription())
+                && getStatus().equals(task.getStatus()) && getId().equals(task.getId())
+                && getEpicId().equals(task.getEpicId());
     }
 }
