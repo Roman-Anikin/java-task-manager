@@ -14,22 +14,23 @@ public class InMemoryTaskManager implements TaskManager {
     private static Long id = 0L;
     private Set<Task> prioritizedTasks = new TreeSet<>();
 
-
     public List<Task> getPrioritizedTasks() {
-        return findIntersections(new ArrayList<>(prioritizedTasks));
+        return new ArrayList<>(prioritizedTasks);
     }
 
-    private List<Task> findIntersections(List<Task> tasks) {
-        for (int i = 1; i < tasks.size(); i++) {
-            if (tasks.get(i).getStartTime() != null && tasks.get(i - 1).getEndTime()
-                    .isAfter(tasks.get(i).getStartTime())) {
-                prioritizedTasks.remove(tasks.get(i));
-                tasks.remove(tasks.get(i));
+    private void findIntersections(Task task) {
+        List<Task> tasks = getPrioritizedTasks();
+        if (tasks.size() == 0 || task.getStartTime() == null || tasks.get(0).getStartTime() == null) {
+            prioritizedTasks.add(task);
+            return;
+        }
+        for (Task value : tasks) {
+            if (value.getStartTime() != null && (value.getEndTime().isBefore(task.getStartTime())
+                    || value.getStartTime().isAfter(task.getEndTime()))) {
+                prioritizedTasks.add(task);
             }
         }
-        return tasks;
     }
-
 
     //Метод для получения списка всех задач
     @Override
@@ -53,6 +54,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTasks() {
         for (Long l : taskList.keySet()) {
+            prioritizedTasks.remove(taskList.get(l));
             historyManager.remove(l);
         }
         taskList.clear();
@@ -62,9 +64,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         for (Long l : subtaskList.keySet()) {
+            prioritizedTasks.remove(subtaskList.get(l));
             historyManager.remove(l);
         }
         for (Long l : epicList.keySet()) {
+            prioritizedTasks.remove(epicList.get(l));
             epicList.get(l).getEpicSubtasks().clear();
             historyManager.remove(l);
         }
@@ -77,6 +81,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllSubtasks() {
         for (EpicTask epicTask : epicList.values()) {
             for (Subtask s : epicTask.getEpicSubtasks()) {
+                prioritizedTasks.remove(s);
                 historyManager.remove(s.getId());
             }
             epicTask.getEpicSubtasks().clear();
@@ -113,7 +118,7 @@ public class InMemoryTaskManager implements TaskManager {
             task.setId(generateId());
         }
         taskList.put(task.getId(), task);
-        prioritizedTasks.add(task);
+        findIntersections(task);
     }
 
     //Метод для создания нового эпика
@@ -135,7 +140,7 @@ public class InMemoryTaskManager implements TaskManager {
         epicList.get(subtask.getEpicId()).getEpicSubtasks().add(subtask);
         subtaskList.put(subtask.getId(), subtask);
         changeEpicStatus(epicList.get(subtask.getEpicId()));
-        prioritizedTasks.add(subtask);
+        findIntersections(subtask);
     }
 
     //Метод для обновления задачи
@@ -143,13 +148,12 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task task) {
         prioritizedTasks.remove(taskList.get(task.getId()));
         taskList.put(task.getId(), task);
-        prioritizedTasks.add(task);
+        findIntersections(task);
     }
 
     //Метод для обновления эпика
     private void updateEpic(EpicTask epic) {
         epicList.put(epic.getId(), epic);
-
     }
 
     //Метод для обновления подзадачи (также происходит обновление статуса эпика)
@@ -158,19 +162,21 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTasks.remove(subtaskList.get(subtask.getId()));
         subtaskList.put(subtask.getId(), subtask);
         EpicTask epicTask = epicList.get(subtask.getEpicId());
-        for (int i = 0; i < epicTask.getEpicSubtasks().size(); i++) {
-            if (epicTask.getEpicSubtasks().get(i).getId().equals(subtask.getId())) {
-                epicTask.getEpicSubtasks().set(i, subtask);
+        for (Subtask s : epicTask.getEpicSubtasks()) {
+            if (s.getId().equals(subtask.getId())) {
+                epicTask.getEpicSubtasks().remove(s);
+                epicTask.getEpicSubtasks().add(subtask);
                 break;
             }
         }
         changeEpicStatus(epicTask);
-        prioritizedTasks.add(subtask);
+        findIntersections(subtask);
     }
 
     //Метод для удаления задачи по ИД
     @Override
     public void deleteTaskById(Long id) {
+        prioritizedTasks.remove(taskList.get(id));
         taskList.remove(id);
         historyManager.remove(id);
     }
@@ -187,9 +193,11 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         for (Long l : keys) {
+            prioritizedTasks.remove(subtaskList.get(l));
             subtaskList.remove(l);
             historyManager.remove(l);
         }
+        prioritizedTasks.remove(epicList.get(id));
         epicList.remove(id);
         historyManager.remove(id);
     }
@@ -197,6 +205,7 @@ public class InMemoryTaskManager implements TaskManager {
     //Метод для удаления подзадачи по ИД (также происходит удаление из списка эпика)
     @Override
     public void deleteSubtaskById(Long id) {
+        prioritizedTasks.remove(subtaskList.get(id));
         Subtask subtask = subtaskList.get(id);
         EpicTask epicTask = epicList.get(subtask.getEpicId());
         epicTask.getEpicSubtasks().remove(subtask);
@@ -207,8 +216,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     //Метод для получения списка подзадач по эпику
     @Override
-    public ArrayList<Subtask> getSubtaskListByEpic(EpicTask epic) {
-        return subtaskList.isEmpty() ? new ArrayList<>() : epic.getEpicSubtasks();
+    public TreeSet<Subtask> getSubtaskListByEpic(EpicTask epic) {
+        return subtaskList.isEmpty() ? new TreeSet<>() : epic.getEpicSubtasks();
     }
 
     //Метод для генерации ИД

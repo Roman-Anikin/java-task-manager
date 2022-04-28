@@ -4,6 +4,7 @@ import task.manager.app.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public interface TaskManager {
 
@@ -41,7 +42,7 @@ public interface TaskManager {
 
     void deleteSubtaskById(Long id);
 
-    ArrayList<Subtask> getSubtaskListByEpic(EpicTask epic);
+    TreeSet<Subtask> getSubtaskListByEpic(EpicTask epic);
 
     List<Task> history();
 

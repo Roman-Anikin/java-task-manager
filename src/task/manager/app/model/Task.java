@@ -83,6 +83,9 @@ public class Task implements Comparable<Task> {
 
     @Override
     public int compareTo(Task o) {
+        if (this.getId().equals(o.getId())) {
+            return 0;
+        }
         if (o.getStartTime() == null) {
             return -1;
         }

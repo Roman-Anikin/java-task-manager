@@ -1,20 +1,17 @@
 package task.manager.app.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.TreeSet;
 
 public class EpicTask extends Task {
 
-    private ArrayList<Subtask> epicSubtasks = new ArrayList<>();
-    private TreeSet<Subtask> subtasksTree;
-
+    private TreeSet<Subtask> epicSubtasks = new TreeSet<>();
 
     public EpicTask(String name, String description, TaskStatus status) {
         super(name, description, status);
     }
 
-    public ArrayList<Subtask> getEpicSubtasks() {
+    public TreeSet<Subtask> getEpicSubtasks() {
         return epicSubtasks;
     }
 
@@ -27,18 +24,15 @@ public class EpicTask extends Task {
     }
 
     public LocalDateTime getStartTime() {
-        subtasksTree = new TreeSet<>(epicSubtasks);
-        return subtasksTree.first().getStartTime();
+        return epicSubtasks.first().getStartTime();
     }
-
 
     public long getDuration() {
         return calculateEpicDuration();
     }
 
     public LocalDateTime getEndTime() {
-        subtasksTree = new TreeSet<>(epicSubtasks);
-        return subtasksTree.last().getEndTime();
+        return epicSubtasks.last().getEndTime();
     }
 
     @Override

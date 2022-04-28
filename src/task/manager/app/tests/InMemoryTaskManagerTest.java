@@ -40,6 +40,7 @@ public class InMemoryTaskManagerTest {
 
         assertEquals(1, taskList.size(), "Invalid number of tasks");
         assertEquals(task, taskList.get(0), "tasks not equal");
+        assertEquals(task, taskManager.getPrioritizedTasks().get(0), "Tasks not equal");
     }
 
     // Тест обновления задачи
@@ -53,8 +54,9 @@ public class InMemoryTaskManagerTest {
         Task task2 = new Task("Test task2", "test disc2", TaskStatus.IN_PROGRESS);
         task2.setId(task.getId());
         taskManager.updateTask(task2);
-        savedTask = taskManager.getTaskById(task2.getId());
-        assertNotEquals(task, savedTask, "Tasks equals");
+        assertEquals(task2, taskManager.getAllTaskList().get(0), "Tasks not equal");
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), "Invalid size");
+        assertEquals(task2, taskManager.getPrioritizedTasks().get(0), "Tasks not equal");
     }
 
     // Тест удаления задачи
@@ -62,16 +64,22 @@ public class InMemoryTaskManagerTest {
     public void deleteTask() {
         // удаление задачи по id
         Task task = new Task("Test task", "test disc", TaskStatus.NEW);
+        task.setStartTime(LocalDateTime.of(2022, 1, 1, 4, 0));
+        task.setDuration(120);
         taskManager.createNewTask(task);
+
         taskManager.deleteTaskById(task.getId());
         List<Task> taskList = taskManager.getAllTaskList();
         assertEquals(0, taskList.size(), "Invalid number of tasks");
+        assertEquals(0, taskManager.getPrioritizedTasks().size(), "Invalid size");
 
         // удаление всех задач
         taskManager.createNewTask(task);
+
         taskManager.deleteAllTasks();
         taskList = taskManager.getAllTaskList();
         assertEquals(0, taskList.size(), "Invalid number of tasks");
+        assertEquals(0, taskManager.getPrioritizedTasks().size(), "Invalid size");
     }
 
     // Тест добавления эпика
@@ -107,6 +115,7 @@ public class InMemoryTaskManagerTest {
         List<EpicTask> epicList = taskManager.getAllEpicList();
         assertEquals(0, epicTask.getEpicSubtasks().size(), "Invalid number of subtasks");
         assertEquals(0, epicList.size(), "Invalid number of epics");
+        assertEquals(0, taskManager.getPrioritizedTasks().size(), "Invalid size");
 
         taskManager.createNewEpic(epicTask);
         subtask.setEpicId(epicTask.getId());
@@ -118,6 +127,7 @@ public class InMemoryTaskManagerTest {
         assertEquals(0, epicTask.getEpicSubtasks().size(), "Invalid number of subtasks");
         assertEquals(0, epicList.size(), "Invalid number of epics");
         assertEquals(0, subtaskList.size(), "Invalid number of subtasks");
+        assertEquals(0, taskManager.getPrioritizedTasks().size(), "Invalid size");
     }
 
     // Тест добавления подзадачи
@@ -140,9 +150,9 @@ public class InMemoryTaskManagerTest {
 
         assertEquals(1, subtaskList.size(), "Invalid number of tasks");
         assertEquals(subtask, subtaskList.get(0), "Subtasks not equal");
-
-        assertEquals(taskManager.getSubtaskListByEpic(epicTask),
-                epicTask.getEpicSubtasks(), "Subtasks not equal");
+        assertEquals(subtask, taskManager.getSubtaskListByEpic(epicTask).first(), "Subtasks not equal");
+        assertEquals(subtask, epicTask.getEpicSubtasks().first(), "Invalid subtask");
+        assertEquals(subtask, taskManager.getPrioritizedTasks().get(0), "Invalid subtask");
 
     }
 
@@ -162,7 +172,11 @@ public class InMemoryTaskManagerTest {
         taskManager.updateSubtask(subtask1);
 
         assertEquals(subtask1, taskManager.getSubtaskById(subtask1.getId()), "Subtasks not equal");
-        assertEquals(subtask1, epicTask.getEpicSubtasks().get(0), "Subtasks not equal");
+        assertEquals(1, epicTask.getEpicSubtasks().size(), "Invalid size");
+        assertEquals(1, taskManager.getAllSubtaskList().size(), "Invalid size");
+        assertEquals(subtask1, epicTask.getEpicSubtasks().first(), "Subtasks not equal");
+        assertEquals(subtask1, taskManager.getPrioritizedTasks().get(0), "Invalid subtask");
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), "Invalid size");
 
     }
 
@@ -178,13 +192,15 @@ public class InMemoryTaskManagerTest {
 
         taskManager.deleteSubtaskById(subtask.getId());
         assertEquals(0, taskManager.getAllSubtaskList().size(), "Invalid number of subtasks");
+        assertEquals(0, epicTask.getEpicSubtasks().size(), "Subtask found");
+        assertEquals(0, taskManager.getPrioritizedTasks().size(), "Invalid size");
 
         taskManager.createNewSubtask(subtask);
 
         taskManager.deleteAllSubtasks();
-        List<Subtask> subtaskList = taskManager.getAllSubtaskList();
-        assertEquals(0, subtaskList.size(), "Invalid number of subtasks");
+        assertEquals(0, taskManager.getAllSubtaskList().size(), "Invalid number of subtasks");
         assertEquals(0, epicTask.getEpicSubtasks().size(), "Invalid number of subtasks");
+        assertEquals(0, taskManager.getPrioritizedTasks().size(), "Invalid size");
     }
 
     // Тест рассчета статуса эпика
@@ -241,21 +257,21 @@ public class InMemoryTaskManagerTest {
 
         Subtask subtask1 = new Subtask("Test subtask1", "subtask1 disc", TaskStatus.NEW);
         subtask1.setEpicId(epicTask.getId());
+        subtask1.setStartTime(LocalDateTime.of(2022, 4, 26, 12, 0));
+        subtask1.setDuration(300);
         taskManager.createNewSubtask(subtask1);
 
         Subtask subtask2 = new Subtask("Test subtask2", "subtask1 disc", TaskStatus.NEW);
         subtask2.setEpicId(epicTask.getId());
-        taskManager.createNewSubtask(subtask2);
-
-        subtask1.setStartTime(LocalDateTime.of(2022, 4, 26, 12, 0));
-        subtask1.setDuration(300);
         subtask2.setStartTime(LocalDateTime.of(2022, 4, 26, 16, 0));
+        subtask2.setDuration(120);
+        taskManager.createNewSubtask(subtask2);
 
         assertEquals(LocalDateTime.of(2022, 4, 26, 12, 0), epicTask.getStartTime(),
                 "Date or time not equals");
-        assertEquals(LocalDateTime.of(2022, 4, 26, 16, 0), epicTask.getEndTime(),
+        assertEquals(LocalDateTime.of(2022, 4, 26, 18, 0), epicTask.getEndTime(),
                 "Date or time not equals");
-        assertEquals(300, epicTask.getDuration(), "Wrong duration");
+        assertEquals(420, epicTask.getDuration(), "Wrong duration");
     }
 
     // Тест для рассчета приоритета задач
@@ -266,11 +282,13 @@ public class InMemoryTaskManagerTest {
         taskManager.createNewTask(task);
 
         Task task1 = new Task("Test task1", "test disc", TaskStatus.IN_PROGRESS);
-        task1.setStartTime(LocalDateTime.of(2022, 4, 26, 12, 0));
+        task1.setStartTime(LocalDateTime.of(2022, 1, 1, 4, 0));
+        task1.setDuration(120);
         taskManager.createNewTask(task1);
 
         Task task2 = new Task("Test2 task", "test disc", TaskStatus.DONE);
-        task2.setStartTime(LocalDateTime.of(2022, 4, 26, 8, 0));
+        task2.setStartTime(LocalDateTime.of(2022, 1, 1, 1, 0));
+        task2.setDuration(120);
         taskManager.createNewTask(task2);
 
         List<Task> taskList = taskManager.getPrioritizedTasks();
@@ -284,8 +302,8 @@ public class InMemoryTaskManagerTest {
     public void findIntersections() {
         // задача не пересекается
         Task task1 = new Task("Test task1", "test disc", TaskStatus.IN_PROGRESS);
-        task1.setStartTime(LocalDateTime.of(2022, 1, 1, 8, 0));
-        task1.setDuration(600);
+        task1.setStartTime(LocalDateTime.of(2022, 1, 1, 1, 0));
+        task1.setDuration(120);
         taskManager.createNewTask(task1);
 
         EpicTask epicTask = new EpicTask("Test epic", "test disc", TaskStatus.IN_PROGRESS);
@@ -293,14 +311,14 @@ public class InMemoryTaskManagerTest {
 
         // задача пересекается с task
         Subtask subtask = new Subtask("Test subtask", "test disc", TaskStatus.DONE);
-        subtask.setStartTime(LocalDateTime.of(2022, 1, 1, 12, 0));
-        subtask.setDuration(300);
+        subtask.setStartTime(LocalDateTime.of(2022, 1, 1, 2, 0));
+        subtask.setDuration(120);
         subtask.setEpicId(epicTask.getId());
         taskManager.createNewSubtask(subtask);
 
         // задача не пересекается
         Subtask subtask1 = new Subtask("Test subtask1", "test disc", TaskStatus.NEW);
-        subtask1.setStartTime(LocalDateTime.of(2022, 1, 1, 19, 0));
+        subtask1.setStartTime(LocalDateTime.of(2022, 1, 1, 4, 0));
         subtask1.setDuration(120);
         subtask1.setEpicId(epicTask.getId());
         taskManager.createNewSubtask(subtask1);
