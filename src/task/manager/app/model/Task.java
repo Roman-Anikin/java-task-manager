@@ -9,6 +9,7 @@ public class Task implements Comparable<Task> {
     private TaskStatus status;
     private Long id;
     private long duration;
+
     private LocalDateTime startTime;
 
 
@@ -88,6 +89,9 @@ public class Task implements Comparable<Task> {
         }
         if (o.getStartTime() == null) {
             return -1;
+        }
+        if (this.getStartTime() == null) {
+            return 1;
         }
         if (this.getStartTime().isBefore(o.getStartTime())) {
             return -1;

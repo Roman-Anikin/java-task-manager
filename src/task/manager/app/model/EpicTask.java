@@ -1,6 +1,7 @@
 package task.manager.app.model;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 public class EpicTask extends Task {
@@ -17,13 +18,18 @@ public class EpicTask extends Task {
 
     private long calculateEpicDuration() {
         long sum = 0;
-        for (Subtask s : epicSubtasks) {
-            sum += s.getDuration();
+        if (epicSubtasks != null) {
+            for (Subtask s : epicSubtasks) {
+                sum += s.getDuration();
+            }
         }
         return sum;
     }
 
     public LocalDateTime getStartTime() {
+        if (epicSubtasks == null || epicSubtasks.isEmpty()) {
+            return null;
+        }
         return epicSubtasks.first().getStartTime();
     }
 
@@ -32,7 +38,14 @@ public class EpicTask extends Task {
     }
 
     public LocalDateTime getEndTime() {
-        return epicSubtasks.last().getEndTime();
+        Iterator<Subtask> subtaskIterator = epicSubtasks.descendingIterator();
+        while (subtaskIterator.hasNext()) {
+            Subtask subtask = subtaskIterator.next();
+            if (subtask.getStartTime() != null) {
+                return subtask.getEndTime();
+            }
+        }
+        return null;
     }
 
     @Override

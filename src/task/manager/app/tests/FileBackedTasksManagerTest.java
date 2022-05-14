@@ -6,9 +6,6 @@ import task.manager.app.model.*;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,9 +30,14 @@ public class FileBackedTasksManagerTest {
         subtask.setDuration(600);
         fb.createNewSubtask(subtask);
 
-        LinkedHashMap<Long, Task> tasks = FileBackedTasksManager.loadFromFile(path).getTasks();
-        assertNotNull(tasks, "Tasks not found");
-        assertEquals(3, tasks.size(), "Invalid number of tasks");
+        Subtask subtask1 = new Subtask("subtask2", "subtask desc2", TaskStatus.DONE);
+        subtask1.setEpicId(epicTask.getId());
+        fb.createNewSubtask(subtask1);
+
+        assertEquals(1, fb.getAllTaskList().size(), "Invalid number of tasks");
+        assertEquals(1, fb.getAllEpicList().size(), "Invalid number of tasks");
+        assertEquals(2, fb.getAllSubtaskList().size(), "Invalid number of tasks");
+
 
         fb.getTaskById(task.getId());
         fb.getEpicById(epicTask.getId());
@@ -48,18 +50,19 @@ public class FileBackedTasksManagerTest {
 
     @Test
     public void loadFromFile() {
-        List<Task> tasks = new ArrayList<>(FileBackedTasksManager.loadFromFile(path).getTasks().values());
-        assertNotNull(tasks, "Tasks not found");
-        assertEquals(3, tasks.size(), "Invalid number of tasks");
+        fb = FileBackedTasksManager.loadFromFile(path);
+        assertEquals(1, fb.getAllTaskList().size(), "Invalid number of tasks");
+        assertEquals(1, fb.getAllEpicList().size(), "Invalid number of tasks");
+        assertEquals(1, fb.getAllSubtaskList().size(), "Invalid number of tasks");
 
-        Task task = tasks.get(0);
-        assertEquals(LocalDateTime.of(2022, 4, 26, 12, 0), task
+        Task task = fb.getEpicById(1L);
+        assertEquals(LocalDateTime.of(2022, 4, 26, 8, 0), task
                 .getStartTime(), "Invalid date or time");
-        assertEquals(300, task.getDuration(), "Invalid duration");
-        assertEquals(task.getStartTime().plusMinutes(300), task.getEndTime(),
+        assertEquals(600, task.getDuration(), "Invalid duration");
+        assertEquals(task.getStartTime().plusMinutes(task.getDuration()), task.getEndTime(),
                 "Invalid date or time");
 
-        fb = FileBackedTasksManager.loadFromFile(path);
+
         assertNotNull(fb.history(), "history is empty");
         assertEquals(3, fb.history().size(), "Invalid number of tasks");
     }

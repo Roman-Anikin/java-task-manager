@@ -33,5 +33,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="google.api.client.gson" level="project" />
+    <orderEntry type="library" name="codehaus.jackson.mapper.asl" level="project" />
   </component>
 </module>
