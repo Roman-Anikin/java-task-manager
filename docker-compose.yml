@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+
+  server:
+    build: .
+    container_name: task-manager
+    image: 'task-manager'
+    ports:
+      - "9090:9090"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/taskmanager
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+
+  db:
+    container_name: db
+    image: 'postgres:14-alpine'
+    ports:
+      - "6541:5432"
+    volumes:
+      - /var/lib/postgresql/data/
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_DB=taskmanager
