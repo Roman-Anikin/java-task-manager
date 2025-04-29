@@ -7,7 +7,7 @@ services:
     container_name: task-manager
     image: 'task-manager'
     ports:
-      - "9090:9090"
+      - "8080:8080"
     depends_on:
       - db
     environment:
@@ -17,9 +17,9 @@ services:
 
   db:
     container_name: db
-    image: 'postgres:14-alpine'
+    image: 'postgres:15-alpine'
     ports:
-      - "6541:5432"
+      - "5433:5432"
     volumes:
       - /var/lib/postgresql/data/
     environment:

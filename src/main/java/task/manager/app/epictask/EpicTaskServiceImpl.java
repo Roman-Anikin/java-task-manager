@@ -157,8 +157,7 @@ public class EpicTaskServiceImpl implements EpicTaskService {
 
     @Override
     public EpicTask checkTask(Long epicId) {
-        return repository.findById(epicId).orElseThrow(() -> {
-            throw new ObjectNotFoundException("Эпик с id " + epicId + " не найден");
-        });
+        return repository.findById(epicId).orElseThrow(() ->
+                new ObjectNotFoundException("Эпик с id " + epicId + " не найден"));
     }
 }

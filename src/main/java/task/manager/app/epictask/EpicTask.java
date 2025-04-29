@@ -1,5 +1,6 @@
 package task.manager.app.epictask;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Setter;
 import task.manager.app.subtask.Subtask;
 import task.manager.app.task.Task;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

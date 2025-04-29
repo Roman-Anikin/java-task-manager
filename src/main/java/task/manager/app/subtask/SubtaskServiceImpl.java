@@ -29,6 +29,7 @@ public class SubtaskServiceImpl implements TaskService<Subtask> {
         setTaskTime(subtask);
         Subtask savedSubtask = repository.save(subtask);
         epic.getSubtasks().add(savedSubtask);
+        savedSubtask.setEpicTask(epic);
         log.info("Добавлена подзадача {}", savedSubtask);
         epicService.setEpicStatus(epic);
         epicService.setTaskTime(epic);
@@ -89,8 +90,7 @@ public class SubtaskServiceImpl implements TaskService<Subtask> {
 
     @Override
     public Subtask checkTask(Long subtaskId) {
-        return repository.findById(subtaskId).orElseThrow(() -> {
-            throw new ObjectNotFoundException("Подзадача с id " + subtaskId + " не найдена");
-        });
+        return repository.findById(subtaskId).orElseThrow(() ->
+                new ObjectNotFoundException("Подзадача с id " + subtaskId + " не найдена"));
     }
 }

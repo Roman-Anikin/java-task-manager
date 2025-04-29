@@ -86,8 +86,7 @@ public class TaskServiceImpl implements TaskService<Task> {
 
     @Override
     public Task checkTask(Long taskId) {
-        return repository.findById(taskId).orElseThrow(() -> {
-            throw new ObjectNotFoundException("Задание с id " + taskId + " не найдено");
-        });
+        return repository.findById(taskId).orElseThrow(() ->
+                new ObjectNotFoundException("Задание с id " + taskId + " не найдено"));
     }
 }

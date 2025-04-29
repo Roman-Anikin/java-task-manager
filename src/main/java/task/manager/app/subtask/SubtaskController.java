@@ -1,10 +1,10 @@
 package task.manager.app.subtask;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import task.manager.app.task.TaskService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController

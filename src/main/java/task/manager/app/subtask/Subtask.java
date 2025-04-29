@@ -2,6 +2,8 @@ package task.manager.app.subtask;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +12,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import task.manager.app.epictask.EpicTask;
 import task.manager.app.task.Task;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Setter
 @Getter
